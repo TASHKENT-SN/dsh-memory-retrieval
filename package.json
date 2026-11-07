@@ -58,5 +58,9 @@
   "homepage": "https://github.com/TASHKENT-SN/dsh-memory-retrieval#readme",
   "bugs": {
     "url": "https://github.com/TASHKENT-SN/dsh-memory-retrieval/issues"
+  },
+  "scripts": {
+    "test": "sh scripts/test-all.sh",
+    "hooks:install": "node scripts/install-hooks.mjs"
   }
 }

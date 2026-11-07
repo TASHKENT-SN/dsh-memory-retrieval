@@ -762,6 +762,24 @@ $dsh = '<DSH 安装目录>\DeepSeek Harness.exe'   # 换成你自己的安装路
 & $dsh test-notes.mjs
 ```
 
+## 提交前自动跑测试
+
+仓库带一个 pre-commit 钩子：提交前跑全部 12 套测试，任何一套失败就中止这次提交。
+
+```sh
+npm run hooks:install   # 一次性安装（.git/hooks 不进版本库，克隆后要跑一次）
+npm test                # 手动跑全部
+```
+
+只想改文档、或本机没装 DSH 时可跳过：
+
+```sh
+git commit --no-verify
+```
+
+钩子优先用宿主的 `DeepSeek Harness.exe` 跑（插件实际跑在 Electron 的 node 里，行为可能和系统 node 不同），
+找不到才退回系统 node；可用 `DSH_BIN` 指定路径。
+
 ## License
 
 MIT

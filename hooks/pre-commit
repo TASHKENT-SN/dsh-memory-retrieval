@@ -1,0 +1,15 @@
+#!/bin/sh
+# pre-commit：提交前跑全部测试，任何一套失败就拦住这次提交。
+#
+# 跳过（只改文档、或本机没装 DSH 时）：
+#   git commit --no-verify
+echo "[pre-commit] 跑测试…"
+sh scripts/test-all.sh
+status=$?
+if [ $status -ne 0 ]; then
+  echo ""
+  echo "[pre-commit] 测试没过，提交已中止。"
+  echo "             确认要跳过：git commit --no-verify"
+  exit $status
+fi
+echo "[pre-commit] 通过"
