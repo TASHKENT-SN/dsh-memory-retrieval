@@ -138,6 +138,14 @@ async function scenario(overrides, sessionId, cue) {
   ok('老片段没被最新片段挤掉', selfText.includes('10Mbps') || selfText.includes('瓶颈在网线'));
 }
 
+// ── 1c. selfMaxChars 必须真的限制输出，而不只是限制候选 ───────────────────
+{
+  const text = await scenario({ selfMaxChars: 200, selfTopK: 5 }, 'session-self', '网络卡顿的原因是什么');
+  const selfText = text('memory-retrieval:self');
+  const body = selfText.split('\n').filter((line) => line.startsWith('- ')).join('\n');
+  ok('超过 selfMaxChars 时只保留能装下的片段', body.length <= 200 + 60);
+}
+
 // ── 2. 自检索总开关关闭时不出块 ─────────────────────────────────────────
 {
   const text = await scenario({ selfRetrieval: false }, 'session-self', '网络卡顿的原因是什么');
