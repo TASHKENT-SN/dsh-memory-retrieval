@@ -159,7 +159,7 @@ dsh plugin --profile web add D:\Alice\dsh-memory-retrieval
 
 ```json
 {
-  "memoryCardPath": "C:\\Users\\you\\.dsh\\surfcore\\characters\\<角色>\\memory\\memory-card.json",
+  "memoryCardPath": "C:\\Users\\you\\.dsh\\<角色插件>\\characters\\<角色>\\memory\\memory-card.json",
   "memoryCardSessionIds": ["<角色所在的会话 id>"],
   "memoryCardTopK": 3,
   "memoryCardMaxChars": 900,
@@ -367,7 +367,7 @@ memory_recall({ query: "上次那个 EPERM 是怎么修的", scope: "self" })
 
 ```json
 {
-  "memoryCardPath": "C:/Users/you/.dsh/surfcore/characters/<角色>/memory/memory-card.json",
+  "memoryCardPath": "C:/Users/you/.dsh/<角色插件>/characters/<角色>/memory/memory-card.json",
   "memoryCardRetrieval": true,
   "memoryCardTopK": 3,
   "memoryCardMaxChars": 900
