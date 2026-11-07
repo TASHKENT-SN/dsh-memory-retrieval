@@ -37,7 +37,7 @@
         "en": "Passive memory recall: when a cue shows up, old sessions and notes surface on their own. Local, read-only, zero API.",
         "zh": "被动的记忆召回：线索一出现，旧会话与笔记自己浮上来。本地、只读、零 API。"
       },
-      "icon": "icons/icon.png",
+      "icon": "icons/icon.jpg",
       "author": "TASHKENT-SN",
       "homepage": "https://github.com/TASHKENT-SN/dsh-memory-retrieval#readme",
       "repository": {
