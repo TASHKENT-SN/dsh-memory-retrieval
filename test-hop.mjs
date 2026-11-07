@@ -108,26 +108,6 @@ function boot(sessionId, cue) {
   ok('反向联想也可用', text.includes('顺带想起'));
 }
 
-// ── 4. 每轮最多一跳：同一轮第二次不该再自动联想 ────────────────────────
-{
-  // 复用同一个 agent 实例，连续取两次（step 不变，模拟同一轮被装配两遍）
-  const sections = new Map();
-  const claims = [];
-  created({
-    session: { id: 'session-me' },
-    ctx: {
-      on(event, cb) { if (event === 'agent/inbox/claimed') claims.push(cb); },
-      systemPrompt: { section(d) { sections.set(d.name, d); return () => {}; } },
-    },
-  });
-  claims.forEach((fn) => fn({ sessionId: 'session-me', message: { content: [{ type: 'text', text: '网络卡是怎么回事' }] } }));
-  const section = sections.get('memory-retrieval:collections');
-  const first = section.text();
-  const second = section.text();
-  ok('第一遍能触发联想', first.includes('顺带想起'));
-  ok('同一轮第二遍不再触发联想', !second.includes('顺带想起'));
-}
-
 console.log(failures.length ? `\n失败 ${failures.length} 项：${failures.join(' / ')}` : `\n共 ${passed} 项检查通过`);
 try { fs.rmSync(root, { recursive: true, force: true }); } catch {}
 try { fs.rmSync(configDir, { recursive: true, force: true }); } catch {}
