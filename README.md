@@ -250,6 +250,9 @@ wc -l ~/.dsh/<角色插件>/characters/<角色>/memory/memory-card-full.jsonl
 
 N 应该等于你自己 `memory-card-full.jsonl` 的行数。这个数字直接暴露"插件解析出多少条"——只读进一部分时会明显偏小，不用靠感觉判断注入厚不厚。
 
+记忆卡在注入前会先跳过**最近 24 条消息里已经出现过的原话**：卡里也可能有刚发生的事，
+把同一段话再贴一遍只会占字数。所以每次注入的都是"当前上下文里没有的"那部分。
+
 ```json
 {
   "memoryCardPath": "C:\\Users\\you\\.dsh\\<角色插件>\\characters\\<角色>\\memory\\memory-card-full.jsonl"

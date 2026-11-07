@@ -52,9 +52,12 @@ selfMessages.push({ role: 'user', text: '刚刚随口一提的临时内容不该
 makeSession('session-self', '自检索会话', selfMessages);
 
 const cardPath = path.join(root, 'memory-card.json');
+const cardEcho = '这周把记忆卡换成全量 jsonl 之后，注入的片段明显变厚了，说明解析没问题。';
 fs.writeFileSync(cardPath, JSON.stringify([
   { text: '她私底下很怕打雷，但从来不承认。' },
   { text: '她答应过主人每天写一句话，后来断了三天。' },
+  // 这条会和下面某个场景的线索完全相同：它已经在上文里，不该再被贴一遍
+  { text: cardEcho },
 ]), 'utf8');
 
 const failures = [];
@@ -173,6 +176,14 @@ async function scenario(overrides, sessionId, cue) {
 {
   const text = await scenario({}, 'session-card', '打雷');
   ok('记忆卡对卡主会话可见', text('memory-retrieval:card').includes('打雷'));
+
+  {
+    // 线索就是卡里那条原文：说明这话刚在上下文里出现过，不该被当作「想起来的旧事」
+    const echoText = await scenario({}, 'session-card', `${cardEcho} 另外打雷那件事呢？`);
+    const block = echoText('memory-retrieval:card');
+    ok('记忆卡不会把当前上下文原话再注入一遍', !block.includes('这周把记忆卡换成全量'));
+    ok('去掉上下文重复后，其它命中仍然注入', block.includes('打雷'));
+  }
   ok('注入卡后同一轮自检索让位', text('memory-retrieval:self') === '');
 }
 
