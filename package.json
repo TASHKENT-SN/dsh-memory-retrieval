@@ -1,6 +1,6 @@
 {
   "name": "dsh-memory-retrieval",
-  "version": "0.9.64",
+  "version": "0.9.65",
   "description": "Local keyword retrieval over a full memory JSONL, injected as relevance-gated candidates into DSH prompts.",
   "type": "module",
   "main": "lib/index.js",
@@ -45,8 +45,8 @@
     }
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "*",
-    "@deepseek-ai/dsh-tools": "*"
+    "@deepseek-ai/cordis": ">=4.1.0 <5.0.0",
+    "@deepseek-ai/dsh-tools": ">=0.2.2-rc.1 <0.3.0"
   },
   "engines": {
     "dsh": ">=0.2.2-rc.1 <0.3.0"
