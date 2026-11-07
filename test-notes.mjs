@@ -315,6 +315,37 @@ await apply(ctx, {
   ok('不会切到日志开头那几条', !joined.includes('第一句填充'));
 }
 
+// ── 11. memory_note 顺手记同义词（方案 B）──────────────────────────
+{
+  const { createNoteTool } = await import('./lib/note-tool.mjs');
+  const learned = path.join(configDir, 'learned-syn.jsonl'.replace('.jsonl', '.json'));
+  let refreshed = 0;
+  const tool = createNoteTool({
+    sourceOf: () => null,
+    skipPatterns: () => [],
+    learnedPath: learned,
+    onSynonymsChanged: () => { refreshed += 1; },
+  });
+
+  const r1 = await tool.execute({ text: '这个项目用 pnpm 不用 npm', kind: 'decision', synonyms: '网速慢,卡顿,延迟' });
+  ok('写笔记时顺带记了同义词', r1.includes('同义词'));
+  const saved = JSON.parse(fs.readFileSync(learned, 'utf8'));
+  ok('同义词进了 learned.json', saved.groups.some((g) => g.includes('网速慢') && g.includes('卡顿')));
+  ok('写词后触发了刷新', refreshed === 1);
+
+  const r2 = await tool.execute({ text: '另一个结论', synonyms: '卡顿,掉帧' });
+  const saved2 = JSON.parse(fs.readFileSync(learned, 'utf8'));
+  ok('与已有词有交集时并进同一组', saved2.groups.some((g) => g.includes('网速慢') && g.includes('掉帧')));
+
+  const r3 = await tool.execute({ text: '只记词不写笔记', synonyms: '路由器,光猫' });
+  ok('只给 synonyms 也能写', r3.includes('同义词'));
+  const saved3 = JSON.parse(fs.readFileSync(learned, 'utf8'));
+  ok('单给词也进表', saved3.groups.some((g) => g.includes('路由器')));
+
+  const r4 = await tool.execute({ synonyms: '只有一个词' });
+  ok('少于两个词会被拒绝', r4.includes('两个词'));
+}
+
 fs.rmSync(root, { recursive: true, force: true });
 console.log(failures.length ? `\n${failures.length} 项失败：\n- ${failures.join('\n- ')}` : '\nNOTES OK');
 if (failures.length) process.exit(1);

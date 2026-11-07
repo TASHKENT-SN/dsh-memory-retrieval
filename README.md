@@ -64,6 +64,9 @@ memory_note(list=true)           # 看看记了什么
 memory_note(origin="a3f9")       # 顺着出处调出原文核对
 memory_note(retire="a3f9")       # 标为作废（不物理删除）
 
+# 顺手把同义词一起记了（不用再单独调 memory_links）
+memory_note(text="这个项目用 pnpm 不用 npm", synonyms="网速慢,卡顿,延迟")
+
 # 主动查（和被动注入是两条路）
 memory_recall(query="pnpm 相关", scope="notes")
 memory_recall(query="...", scope="all")     # 笔记 + 自历史 + 集合 + 记忆卡
