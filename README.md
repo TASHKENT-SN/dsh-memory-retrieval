@@ -79,7 +79,7 @@ memory_recall(query="...", scope="all")     # 笔记 + 自历史 + 集合 + 记�
 
 ```powershell
 # 1) 把本目录加入 profile 依赖（示例：web profile）
-dsh plugin --profile web add D:\Alice\dsh-memory-retrieval
+dsh plugin --profile web add <你的本地路径>\dsh-memory-retrieval
 
 # 2) 在 profile 的 package.json 里把包加入 bundles
 #    "dsh": { "profile": { "bundles": [ ..., "dsh-memory-retrieval" ] } }
@@ -437,7 +437,7 @@ node menu.mjs --set topK=8 --set askWhenUnsure=false
 一行一条 JSON：
 
 ```json
-{"id":"m1","title":"称呼","text":"用户希望被叫作阿岚。","tags":["称呼","阿岚"],"workspace":"D:\\Alice","importance":4,"at":"2026-01-01T00:00:00+08:00"}
+{"id":"m1","title":"称呼","text":"用户希望被叫作示例名。","tags":["称呼","示例名"],"workspace":"/path/to/your-workspace","importance":4,"at":"2026-01-01T00:00:00+08:00"}
 ```
 
 - `text` 必填；
@@ -674,11 +674,19 @@ node test-ui.mjs       # 用 React 桩把设置页真渲染一遍，抓白屏类
 
 ```powershell
 $env:ELECTRON_RUN_AS_NODE='1'
-& 'D:\杂物\工具\DSH\DeepSeek Harness.exe' test-lexical.mjs
-& 'D:\杂物\工具\DSH\DeepSeek Harness.exe' test-import.mjs
-& 'D:\杂物\工具\DSH\DeepSeek Harness.exe' test-mock.mjs
-& 'D:\杂物\工具\DSH\DeepSeek Harness.exe' test-api.mjs
-& 'D:\杂物\工具\DSH\DeepSeek Harness.exe' test-ui.mjs
+$dsh = '<DSH 安装目录>\DeepSeek Harness.exe'   # 换成你自己的安装路径
+
+& $dsh test-lexical.mjs
+& $dsh test-import.mjs
+& $dsh test-mock.mjs
+& $dsh test-api.mjs
+& $dsh test-ui.mjs
+& $dsh test-incremental.mjs
+& $dsh test-self-card.mjs
+& $dsh test-synonyms.mjs
+& $dsh test-words.mjs
+& $dsh test-hop.mjs
+& $dsh test-notes.mjs
 ```
 
 ## License
