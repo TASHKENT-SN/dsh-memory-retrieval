@@ -198,7 +198,7 @@ dsh plugin --profile web add <你的本地路径>\dsh-memory-retrieval
 
 ```json
 {
-  "memoryCardPath": "C:\\Users\\you\\.dsh\\<角色插件>\\characters\\<角色>\\memory\\memory-card.json",
+  "memoryCardPath": "C:\\Users\\you\\.dsh\\<角色插件>\\characters\\<角色>\\memory\\memory-card-full.jsonl",
   "memoryCardSessionIds": ["<角色所在的会话 id>"],
   "memoryCardTopK": 3,
   "memoryCardMaxChars": 900,
@@ -211,6 +211,42 @@ dsh plugin --profile web add <你的本地路径>\dsh-memory-retrieval
 - 只有名单里的会话会注入它，也只有它们能用 `memory_recall(scope=card)` 查它；
 - **没有"全局可读"开关**，这是有意的：角色的私人记忆不该漏进别的工作会话；
 - 想让别的会话也能用这张卡 → 把那个会话 id 加进 `memoryCardSessionIds`。
+
+### 装完先验一下：是全量，还是裁剪版
+
+角色插件通常同时留着几个文件：
+
+| 文件 | 是什么 |
+|---|---|
+| `memory-card.json` | **活跃卡**，会被维护脚本裁剪、降权、清理，条数少 |
+| `memory-card-full.jsonl` | **全量归档**，一行一条，只增不减 |
+| `memory-card-full.md` | 给人看的可读版，插件不读 |
+
+`memoryCardPath` 指错的话，插件读到的就是被裁剪过的那份——记忆看着"总是差一点"，很难察觉。
+
+**最简单的检查方式：直接问你的角色。**
+
+```
+你现在读到的记忆卡有多少条？是全量归档还是裁剪版？
+```
+
+它应该会调用 `memory_recall(scope=card)` 或去看配置，然后报一个条数。然后你自己核对：
+
+```bash
+# 全量归档应有的条数
+wc -l ~/.dsh/<角色插件>/characters/<角色>/memory/memory-card-full.jsonl
+```
+
+- **对得上** → 读的是全量；
+- **明显少** → `memoryCardPath` 还指着 `memory-card.json`，改成 `.jsonl` 那份。
+
+**0.9.66 起两种格式都支持**：`.json`（数组或 `{ records }`）和 `.jsonl`（一行一条，坏行自动跳过）。
+
+```json
+{
+  "memoryCardPath": "C:\\Users\\you\\.dsh\\<角色插件>\\characters\\<角色>\\memory\\memory-card-full.jsonl"
+}
+```
 
 ### 记忆卡 ≠ 集合（别混）
 
