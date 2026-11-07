@@ -234,6 +234,27 @@ await apply(ctx, {
   ok('查不到时明说', empty.includes('没有和'));
 }
 
+// ── 8. 集合检索里也能拿到成员会话的笔记 ────────────────────────────
+{
+  makeSession('session-third', '会话丙', [
+    { role: 'user', text: '部署就定在周五，别安排周一。', time: now - 5000_000 },
+  ]);
+  let created4;
+  const tools4 = new Map();
+  const ctx4 = { on(event, cb) { if (event === 'agent/created') created4 = cb; }, effect(fn) { fn(); }, tools: { register(t) { tools4.set(t.name, t); return () => {}; } } };
+  await apply(ctx4, {
+    memoryPath: '',
+    enabled: true,
+    collections: [{ id: 'c-notes3', name: '笔记集合', sessionIds: ['session-note', 'session-third'] }],
+    collectionRetrieval: true,
+    selfRetrieval: false,
+  });
+  const recall4 = tools4.get('memory_recall');
+  const res = await recall4.execute({ query: '部署安排在哪天', scope: 'collections', topK: 5 }, { agent: { session: { id: 'session-note' } } });
+  ok('集合检索能拿到别人的笔记', res.includes('部署在周五'));
+  ok('并标明来自笔记', res.includes('笔记'));
+}
+
 fs.rmSync(root, { recursive: true, force: true });
 console.log(failures.length ? `\n${failures.length} 项失败：\n- ${failures.join('\n- ')}` : '\nNOTES OK');
 if (failures.length) process.exit(1);
