@@ -51,12 +51,12 @@
       },
       "versions": [
         {
-          "version": "0.9.65",
-          "publishTimestamp": 1794055961,
+          "version": "0.9.66",
+          "publishTimestamp": 1794056960,
           "source": {
             "type": "git",
             "url": "https://github.com/TASHKENT-SN/dsh-memory-retrieval.git",
-            "commit": "372db4e17d55305de88ec84d4a39d1caaac41199"
+            "commit": "901292b9a7c373b2e2ef3230239147bb54481381"
           },
           "engines": {
             "dsh": ">=0.2.2-rc.1 <0.3.0"
