@@ -54,7 +54,8 @@ makeSession('session-self', '自检索会话', selfMessages);
 const cardPath = path.join(root, 'memory-card.json');
 const cardEcho = '这周把记忆卡换成全量 jsonl 之后，注入的片段明显变厚了，说明解析没问题。';
 fs.writeFileSync(cardPath, JSON.stringify([
-  { text: '她私底下很怕打雷，但从来不承认。' },
+  // 带 createdAt：注入块必须写出发出时间，否则模型分不清旧事新旧
+  { text: '她私底下很怕打雷，但从来不承认。', createdAt: '2026-10-01T10:00:00Z' },
   { text: '她答应过主人每天写一句话，后来断了三天。' },
   // 这条会和下面某个场景的线索完全相同：它已经在上文里，不该再被贴一遍
   { text: cardEcho },
@@ -175,7 +176,11 @@ async function scenario(overrides, sessionId, cue) {
 // ── 3. 记忆卡：白名单会话能读到 ─────────────────────────────────────────
 {
   const text = await scenario({}, 'session-card', '打雷');
-  ok('记忆卡对卡主会话可见', text('memory-retrieval:card').includes('打雷'));
+  // 注意：section.text() 有副作用（注入即记入去重表），同一轮调第二次会返回空。
+  // 所以这里只取一次，拿同一份 block 做多条断言。
+  const cardBlock = text('memory-retrieval:card');
+  ok('记忆卡对卡主会话可见', cardBlock.includes('打雷'));
+  ok('记忆卡注入带记录时间', cardBlock.includes('2026-10-01'));
 
   {
     // 线索就是卡里那条原文：说明这话刚在上下文里出现过，不该被当作「想起来的旧事」
