@@ -266,6 +266,32 @@ await apply(ctx, {
   ok('并标明来自笔记', res.includes('笔记'));
 }
 
+// ── 9. 出处片段太短时，不要假装精确 ────────────────────────────────
+{
+  makeSession('session-short', '短消息会话', [
+    { role: 'user', text: '1', time: now - 100_000 },
+    { role: 'user', text: '这条比较长一些，可以用来当锚点，里面有个特征词：铅笔。', time: now - 90_000 },
+  ]);
+  const shortNote = {
+    id: 'short1',
+    text: '随口记的一条',
+    kind: 'fact',
+    source: { sessionId: 'session-short', title: '短消息会话', time: now - 100_000, excerpt: '1' },
+  };
+  const res = findOrigin(shortNote, { skipPatterns: [] });
+  ok('一个字的出处不当锚点', res.messages.length >= 1);
+  ok('会说明是按时间取的', !!res.reason);
+
+  const longNote = {
+    id: 'long1',
+    text: '记了铅笔的事',
+    kind: 'fact',
+    source: { sessionId: 'session-short', title: '短消息会话', time: now - 90_000, excerpt: '这条比较长一些，可以用来当锚点' },
+  };
+  const hit = findOrigin(longNote, { skipPatterns: [] });
+  ok('够长的出处能精确命中', hit.messages.some((m) => m.text.includes('铅笔')));
+}
+
 fs.rmSync(root, { recursive: true, force: true });
 console.log(failures.length ? `\n${failures.length} 项失败：\n- ${failures.join('\n- ')}` : '\nNOTES OK');
 if (failures.length) process.exit(1);
