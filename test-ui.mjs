@@ -247,6 +247,10 @@ const advanced = expand(tree);
 const advancedText = textOf(advanced).join(' | ');
 if (!advancedText.includes('全局检索')) throw new Error('高级设置里缺少工作区「全局检索」开关');
 if (!advancedText.includes('会话开关（按工作区分组）')) throw new Error('高级设置里缺少逐会话开关');
+// 数字字段要把范围写进标签，否则用户看不到上限（输入超了会被悄悄夹回）
+if (!advancedText.includes('最多注入几段（1–10）')) throw new Error('自检索「最多注入几段」没显示范围 1–10');
+if (!advancedText.includes('注入总字数上限（200–4000）')) throw new Error('自检索「注入总字数上限」没显示范围 200–4000');
+if (!advancedText.includes('至少命中几个查询词（1–6）')) throw new Error('minHits 没显示范围');
 const checkboxes = find(advanced, (node) => node.type === 'input' && node.props.type === 'checkbox');
 // 总开关 3 个 + 工作区 2 个 + 会话 3 个
 if (checkboxes.length < 8) throw new Error(`复选框数量不对：${checkboxes.length}`);
