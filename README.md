@@ -45,6 +45,10 @@ memory_note(text="用户偏好：先给结论，再给理由", kind="preference"
 memory_note(list=true)           # 看看记了什么
 memory_note(origin="a3f9")       # 顺着出处调出原文核对
 memory_note(retire="a3f9")       # 标为作废（不物理删除）
+
+# 主动查（和被动注入是两条路）
+memory_recall(query="pnpm 相关", scope="notes")
+memory_recall(query="...", scope="all")     # 笔记 + 自历史 + 集合 + 记忆卡
 ```
 
 **每条都带出处**：会话标题、时间、当时的原话片段。注入块长这样：
@@ -65,7 +69,7 @@ memory_note(retire="a3f9")       # 标为作废（不物理删除）
 | 重复 | 内容哈希去重，同样的结论只存一条 |
 | 作废 | 追加一条 `retired` 记录，原始行保留可追溯 |
 | 注入优先级 | `order: 0`，排在其他四种来源之前 |
-| **可见范围** | 跟着来源会话走：本会话 + 与它同属一个集合的会话；集合外的笔记看不见 |
+| **可见范围** | 跟着来源会话走：本会话 + 与它同属一个集合的会话；集合外的笔记看不见。注入和  用同一套规则 |
 | 无相关笔记时 | 仍注入最近 1–2 条 `preference`/`decision`（长期有效，不需要被勾起） |
 | 存储 | `~/.dsh/dsh-memory-retrieval/notes.jsonl`，append-only |
 

@@ -203,6 +203,37 @@ await apply(ctx, {
   ok('并标了来自哪本会话', block.includes('《会话丙》'));
 }
 
+// ── 7. 主动查：memory_recall(scope=notes) ──────────────────────────
+{
+  let created3;
+  const tools3 = new Map();
+  const ctx3 = { on(event, cb) { if (event === 'agent/created') created3 = cb; }, effect(fn) { fn(); }, tools: { register(t) { tools3.set(t.name, t); return () => {}; } } };
+  await apply(ctx3, {
+    memoryPath: '',
+    enabled: true,
+    collections: [{ id: 'c-notes2', name: '笔记集合', sessionIds: ['session-note', 'session-third'] }],
+    collectionRetrieval: false,
+    selfRetrieval: false,
+  });
+
+  const recall = tools3.get('memory_recall');
+  ok('memory_recall 已注册', !!recall);
+  const exec = { agent: { session: { id: 'session-note' } } };
+
+  const hit = await recall.execute({ query: 'pnpm 依赖', scope: 'notes', topK: 5 }, exec);
+  ok('scope=notes 能查到笔记', hit.includes('pnpm'));
+  ok('结果带 id，可调原文', /id=[0-9a-f]+/.test(hit));
+
+  const outsider = await recall.execute({ query: '看牙 周末', scope: 'notes', topK: 5 }, exec);
+  ok('集合外的笔记查不到', !outsider.includes('周末去看牙'));
+
+  const all = await recall.execute({ query: 'pnpm 依赖', scope: 'all', topK: 5 }, exec);
+  ok('scope=all 也包含笔记', all.includes('pnpm'));
+
+  const empty = await recall.execute({ query: '完全无关的词汇xyz', scope: 'notes', topK: 5 }, exec);
+  ok('查不到时明说', empty.includes('没有和'));
+}
+
 fs.rmSync(root, { recursive: true, force: true });
 console.log(failures.length ? `\n${failures.length} 项失败：\n- ${failures.join('\n- ')}` : '\nNOTES OK');
 if (failures.length) process.exit(1);
