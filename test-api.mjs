@@ -168,6 +168,21 @@ if ((saveWithStale.body.config.collections || []).length !== 1) throw new Error(
 const deleted = await request('POST', '/api/dsh-memory-retrieval/collections', { action: 'delete', collectionId: colId });
 if (deleted.body.collections.length !== 0) throw new Error('删除集合失败');
 
+// ── 手工改 config.json 后 /reload 必须重读文件（0.9.47 修的 bug）──────
+{
+  const configFile = path.join(temp, 'config.json');
+  const current = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+  fs.writeFileSync(configFile, JSON.stringify({ ...current, selfTopK: 4 }, null, 2), 'utf8');
+
+  const before = await request('GET', '/api/dsh-memory-retrieval/config');
+  if (before.body.config.selfTopK !== 2) throw new Error('读文件前内存里应该还是旧值 2');
+
+  const reloaded = await request('POST', '/api/dsh-memory-retrieval/reload');
+  if (!reloaded.body?.ok) throw new Error('/reload 失败');
+  const after = await request('GET', '/api/dsh-memory-retrieval/config');
+  if (after.body.config.selfTopK !== 4) throw new Error('reload 没有重读 config.json（selfTopK 仍是 ' + after.body.config.selfTopK + '）');
+}
+
 fs.rmSync(sessionsRoot, { recursive: true, force: true });
 fs.rmSync(memoryPath, { force: true });
 fs.rmSync(temp, { recursive: true, force: true });
