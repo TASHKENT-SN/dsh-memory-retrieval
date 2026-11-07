@@ -30,7 +30,7 @@
 ## 主动检索（可选）
 
 除了被动撞上来，还有一个工具 `memory_recall`：模型想查旧账时可以主动调用，
-支持 `scope=collections | self | card | all`。这是补充手段，不是主路径——
+支持 `scope=collections | self | card | notes | all`。这是补充手段，不是主路径——
 **主路径永远是"它自己想起来"，而不是"你让它去查"**。
 
 **纯本地**：不调 API、不做 embedding、不联网；只有注入的候选块占输入 token（默认上限约 1400 字）。
