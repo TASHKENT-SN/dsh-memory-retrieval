@@ -1,0 +1,7 @@
+node_modules/
+# 测试产物
+sessions-fixture-*/
+.test-config/
+# 本地日志与备份
+*.log
+backups/

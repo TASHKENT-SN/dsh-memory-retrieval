@@ -1,0 +1,26 @@
+- insert:
+    - id: dsh-memory-retrieval
+      name: 'dsh-memory-retrieval'
+      config:
+        enabled: true
+        label: 'Memory'
+        topK: 5
+        maxChars: 800
+        minScore: 1
+        perRecordChars: 180
+        askWhenUnsure: true
+        includeSessionPatterns: []
+        excludeSessionPatterns: []
+        # collections: drag sessions together in the settings page
+        collectionRetrieval: true
+        collectionTopK: 5
+        collectionMaxChars: 1400
+        collectionPerSnippetChars: 300
+        collectionChunkChars: 600
+        collectionSessionCapChars: 0
+        collections: []
+        # matching strictness + synonyms (v0.8.0)
+        minHits: 2
+        synonymsEnabled: true
+        synonymPath: ''
+        synonymWeight: 0.7

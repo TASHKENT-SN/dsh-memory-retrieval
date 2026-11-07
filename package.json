@@ -1,0 +1,62 @@
+{
+  "name": "dsh-memory-retrieval",
+  "version": "0.9.46",
+  "description": "Local keyword retrieval over a full memory JSONL, injected as relevance-gated candidates into DSH prompts.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./retrieval": "./lib/retrieval.mjs"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "menu.mjs",
+    "memory.example.jsonl",
+    "README.md",
+    "LICENSE",
+    "synonyms.example.json",
+    "tools"
+  ],
+  "bin": {
+    "dsh-memory-retrieval-menu": "./menu.mjs"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "memory",
+    "retrieval"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ],
+      "immediately": true
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "engines": {
+    "dsh": ">=0.2.2-rc.1 <0.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TODO-your-name/dsh-memory-retrieval.git"
+  },
+  "homepage": "https://github.com/TODO-your-name/dsh-memory-retrieval#readme",
+  "bugs": {
+    "url": "https://github.com/TODO-your-name/dsh-memory-retrieval/issues"
+  }
+}
