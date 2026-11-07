@@ -151,6 +151,58 @@ await apply(ctx, {
   ok('同一轮不重复注入', section.text() === '');
 }
 
+// ── 5. 笔记跟着来源会话走：同集合可见，集合外不可见 ─────────────────
+{
+  const file = path.join(configDir, 'notes.jsonl');
+  addNote({ text: '甲会话的私事：周末去看牙', kind: 'fact', source: { sessionId: 'session-other', title: '会话乙', time: now, excerpt: '' } }, file);
+  addNote({ text: '丙会话的事：项目用 pnpm', kind: 'decision', source: { sessionId: 'session-third', title: '会话丙', time: now, excerpt: '' } }, file);
+
+  const claims = [];
+  const agentSections = new Map();
+  created({
+    session: { id: 'session-note' },
+    ctx: {
+      on(event, cb) { if (event === 'agent/inbox/claimed') claims.push(cb); },
+      systemPrompt: { section(d) { agentSections.set(d.name, d); return () => {}; } },
+      tools: { register(t) { tools.set(t.name, t); return () => {}; } },
+    },
+  });
+  claims.forEach((fn) => fn({ sessionId: 'session-note', message: { content: [{ type: 'text', text: '看牙和 pnpm 都聊一下' }] } }));
+  const block = agentSections.get('memory-retrieval:notes').text();
+  ok('集合外的笔记不进来', !block.includes('周末去看牙'));
+  ok('本会话的笔记仍在', block.includes('pnpm'));
+}
+
+// ── 6. 集合内其它会话的笔记：进了同一个池子 ─────────────────────────
+{
+  addNote({ text: '部署在周五，别安排在周一', kind: 'decision', source: { sessionId: 'session-third', title: '会话丙', time: now, excerpt: '' } }, path.join(configDir, 'notes.jsonl'));
+
+  let created2;
+  const ctx2 = { on(event, cb) { if (event === 'agent/created') created2 = cb; }, effect(fn) { fn(); }, tools: { register() { return () => {}; } } };
+  await apply(ctx2, {
+    memoryPath: '',
+    enabled: true,
+    collections: [{ id: 'c-notes', name: '笔记集合', sessionIds: ['session-note', 'session-third'] }],
+    collectionRetrieval: false,
+    selfRetrieval: false,
+  });
+
+  const claims = [];
+  const agentSections = new Map();
+  created2({
+    session: { id: 'session-note' },
+    ctx: {
+      on(event, cb) { if (event === 'agent/inbox/claimed') claims.push(cb); },
+      systemPrompt: { section(d) { agentSections.set(d.name, d); return () => {}; } },
+      tools: { register() { return () => {}; } },
+    },
+  });
+  claims.forEach((fn) => fn({ sessionId: 'session-note', message: { content: [{ type: 'text', text: '部署安排在什么时候' }] } }));
+  const block = agentSections.get('memory-retrieval:notes').text();
+  ok('同集合会话的笔记进池子', block.includes('部署在周五'));
+  ok('并标了来自哪本会话', block.includes('《会话丙》'));
+}
+
 fs.rmSync(root, { recursive: true, force: true });
 console.log(failures.length ? `\n${failures.length} 项失败：\n- ${failures.join('\n- ')}` : '\nNOTES OK');
 if (failures.length) process.exit(1);
