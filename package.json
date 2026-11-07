@@ -1,6 +1,6 @@
 {
   "name": "dsh-memory-retrieval",
-  "version": "0.9.69",
+  "version": "0.9.70",
   "description": "Local keyword retrieval over a full memory JSONL, injected as relevance-gated candidates into DSH prompts.",
   "type": "module",
   "main": "lib/index.js",
