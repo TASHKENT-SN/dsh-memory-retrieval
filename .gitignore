@@ -2,6 +2,12 @@ node_modules/
 # 测试产物
 sessions-fixture-*/
 .test-config/
+.*-test/
 # 本地日志与备份
 *.log
 backups/
+# 打包/系统垃圾
+*.tgz
+.DS_Store
+Thumbs.db
+coverage/
