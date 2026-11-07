@@ -292,6 +292,29 @@ await apply(ctx, {
   ok('够长的出处能精确命中', hit.messages.some((m) => m.text.includes('铅笔')));
 }
 
+// ── 10. 时间窗口内的命中，不能因为下标错位而切到别的消息 ────────────
+{
+  // 全量消息里目标在第 4 条，但在「±5 分钟窗口」里它是第 1 条。
+  // 早先的实现直接拿窗口下标去切全量数组，会切到日志开头。
+  const t = now - 3600_000;
+  makeSession('session-window', '窗口错位会话', [
+    { role: 'user', text: '很早以前的第一句填充，不该被当成原文。', time: t - 400_000 },
+    { role: 'user', text: '很早以前的第二句填充，也不该出现。', time: t - 300_000 },
+    { role: 'user', text: '这句是真正的原文锚点：周末去修自行车。', time: t },
+    { role: 'assistant', text: '好，周末修车。', time: t + 30_000 },
+  ]);
+  const note = {
+    id: 'win1',
+    text: '周末要修车',
+    kind: 'fact',
+    source: { sessionId: 'session-window', title: '窗口错位会话', time: t, excerpt: '这句是真正的原文锚点' },
+  };
+  const res = findOrigin(note, { skipPatterns: [] });
+  const joined = res.messages.map((m) => m.text).join('\n');
+  ok('窗口内命中时返回的是目标消息', joined.includes('周末去修自行车'));
+  ok('不会切到日志开头那几条', !joined.includes('第一句填充'));
+}
+
 fs.rmSync(root, { recursive: true, force: true });
 console.log(failures.length ? `\n${failures.length} 项失败：\n- ${failures.join('\n- ')}` : '\nNOTES OK');
 if (failures.length) process.exit(1);
