@@ -1,0 +1,68 @@
+{
+  "format": 1,
+  "title": {
+    "en": "DSH memory plugins",
+    "zh": "DSH 记忆类插件"
+  },
+  "description": {
+    "en": "Plugins that give DSH agents recall.",
+    "zh": "让 DSH 的 agent 能想起旧事的插件。"
+  },
+  "metadata": {
+    "categories": {
+      "memory": {
+        "title": {
+          "en": "Memory",
+          "zh": "记忆"
+        }
+      }
+    },
+    "labels": {
+      "zero-api": {
+        "title": {
+          "en": "Zero API",
+          "zh": "零 API"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-memory-retrieval",
+      "title": {
+        "en": "dsh-memory-retrieval",
+        "zh": "死去的记忆突然开始攻击我"
+      },
+      "description": {
+        "en": "Passive memory recall: when a cue shows up, old sessions and notes surface on their own. Local, read-only, zero API.",
+        "zh": "被动的记忆召回：线索一出现，旧会话与笔记自己浮上来。本地、只读、零 API。"
+      },
+      "icon": "icons/icon.png",
+      "author": "TASHKENT-SN",
+      "homepage": "https://github.com/TASHKENT-SN/dsh-memory-retrieval#readme",
+      "repository": {
+        "url": "https://github.com/TASHKENT-SN/dsh-memory-retrieval"
+      },
+      "metadata": {
+        "category": "memory",
+        "labels": [
+          "zero-api"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.9.64",
+          "publishTimestamp": 1794053948,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/TASHKENT-SN/dsh-memory-retrieval.git",
+            "commit": "76087d2443d8457295df0b8596213335731244fd"
+          },
+          "engines": {
+            "dsh": ">=0.2.2-rc.1 <0.3.0"
+          }
+        }
+      ]
+    }
+  ]
+}
