@@ -146,6 +146,23 @@ async function scenario(overrides, sessionId, cue) {
   ok('超过 selfMaxChars 时只保留能装下的片段', body.length <= 200 + 60);
 }
 
+// ── 1d. 近期高分片段不能把老片段挤掉（候选池必须够深）──────────────────────
+{
+  // 构造：1 条很早的相关片段 + 30 条一分钟前的相关片段。
+  // 若候选池只有 selfTopK×4（=4），取到的全是新的，过滤后一条不剩。
+  // 老消息要单独成段：分块是按字符数累积的，混进新消息就会带上新时间
+  const oldText = '很久以前记的：网络卡顿的根因是墙内那段线只有 100M。' + '补足长度让它超过默认分块阈值（600 字），这样它自己就是一段，不会和后面的新消息合并。'.repeat(12);
+  const msgs = [{ role: 'user', text: oldText, time: now - 5 * HOUR }];
+  for (let i = 0; i < 30; i += 1) {
+    msgs.push({ role: i % 2 ? 'assistant' : 'user', text: `刚才第 ${i} 句：网络卡顿，链路速率，瓶颈，这些都还在聊。`, time: now - 60_000 + i * 100 });
+  }
+  makeSession('session-self-deep', '近期片段很多', msgs);
+
+  const text = await scenario({ selfTopK: 1, selfMaxChars: 600 }, 'session-self-deep', '网络卡顿 链路速率 瓶颈');
+  const selfText = text('memory-retrieval:self');
+  ok('近期高分片段不会把老片段挤掉', selfText.includes('墙内那段线'));
+}
+
 // ── 2. 自检索总开关关闭时不出块 ─────────────────────────────────────────
 {
   const text = await scenario({ selfRetrieval: false }, 'session-self', '网络卡顿的原因是什么');
