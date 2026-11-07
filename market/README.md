@@ -8,7 +8,7 @@
 2. 切到「发现」→ 添加索引源 → 粘贴：
 
 ```
-https://TASHKENT-SN.github.io/dsh-memory-retrieval/market/index.json
+https://tashkent-sn.github.io/dsh-memory-retrieval/market/index.json
 ```
 
 ## 里面是什么

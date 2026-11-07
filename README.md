@@ -96,6 +96,24 @@ memory_recall(query="...", scope="all")     # 笔记 + 自历史 + 集合 + 记�
 
 配置：`notesEnabled`（默认 true）、`notesTopK`（3）、`notesMaxChars`（600）、`notesAlwaysInject`（true）。
 
+## 插件市场
+
+插件市场在 DSH 里是**一个 JSON 索引**，不内置任何源——所以下面这个索引由本仓库自己发布
+（`market/index.json`，可自行核对内容）：
+
+```
+https://tashkent-sn.github.io/dsh-memory-retrieval/market/index.json
+```
+
+用法：
+
+1. 插件 → 实验性插件 → 打开「自定义插件市场」
+2. 切到「发现」→ 添加索引源 → 粘贴上面的 URL
+3. 卡片上会显示本插件，点安装即从锁定的 commit 拉取
+
+> 索引里的每个版本都锁定了 40 位 commit，`engines.dsh` 与 `package.json` 一致；
+> 不经过 npm，也不依赖第三方市场。
+
 ## 安装
 
 ```powershell
