@@ -33,6 +33,16 @@ function makeSession(sessionId, title, messages) {
   fs.writeFileSync(path.join(dir, 'session.v4.jsonl.zstd'), zlib.zstdCompressSync(Buffer.from(lines.join('\n') + '\n', 'utf8')));
 }
 
+// DSH 的注册契约：工具必须声明 output { schema, render }。
+// 之前 memory_note 漏了它，线上直接注册失败——用同样的校验把这类问题挡在测试里。
+function registerChecked(map, tool) {
+  if (!tool?.output || !tool.output.schema || typeof tool.output.render !== 'function') {
+    throw new Error(`tool "${tool?.name}" must declare output { schema, render }`);
+  }
+  map.set(tool.name, tool);
+  return () => {};
+}
+
 const failures = [];
 function ok(label, pass) {
   if (!pass) failures.push(label);
@@ -93,7 +103,7 @@ const tools = new Map();
 const ctx = {
   on(event, cb) { if (event === 'agent/created') created = cb; },
   effect(fn) { fn(); },
-  tools: { register(tool) { tools.set(tool.name, tool); return () => {}; } },
+  tools: { register(tool) { return registerChecked(tools, tool); } },
 };
 await apply(ctx, {
   memoryPath: '',
@@ -113,7 +123,7 @@ await apply(ctx, {
     ctx: {
       on(event, cb) { if (event === 'agent/inbox/claimed') claims.push(cb); },
       systemPrompt: { section(d) { sections.set(d.name, d); return () => {}; } },
-      tools: { register(tool) { tools.set(tool.name, tool); return () => {}; } },
+      tools: { register(tool) { return registerChecked(tools, tool); } },
     },
   });
   claims.forEach((fn) => fn({ sessionId: 'session-empty', message: { content: [{ type: 'text', text: '随便问问' }] } }));
@@ -125,6 +135,7 @@ await apply(ctx, {
 {
   const tool = tools.get('memory_note');
   ok('memory_note 已注册', !!tool);
+  ok('memory_note 声明了 output（DSH 的硬要求）', !!tool?.output?.schema && typeof tool.output.render === 'function');
   const written = await tool.execute({ text: '这个项目用 pnpm 不用 npm', kind: 'decision' });
   ok('工具写入成功', written.includes('已记住'));
   const listed = await tool.execute({ list: true });
@@ -137,7 +148,7 @@ await apply(ctx, {
     ctx: {
       on(event, cb) { if (event === 'agent/inbox/claimed') claims.push(cb); },
       systemPrompt: { section(d) { agentSections.set(d.name, d); return () => {}; } },
-      tools: { register(t) { tools.set(t.name, t); return () => {}; } },
+      tools: { register(t) { return registerChecked(tools, t); } },
     },
   });
   claims.forEach((fn) => fn({ sessionId: 'session-note', message: { content: [{ type: 'text', text: 'pnpm 装依赖怎么又失败了' }] } }));
@@ -164,7 +175,7 @@ await apply(ctx, {
     ctx: {
       on(event, cb) { if (event === 'agent/inbox/claimed') claims.push(cb); },
       systemPrompt: { section(d) { agentSections.set(d.name, d); return () => {}; } },
-      tools: { register(t) { tools.set(t.name, t); return () => {}; } },
+      tools: { register(t) { return registerChecked(tools, t); } },
     },
   });
   claims.forEach((fn) => fn({ sessionId: 'session-note', message: { content: [{ type: 'text', text: '看牙和 pnpm 都聊一下' }] } }));
@@ -207,7 +218,7 @@ await apply(ctx, {
 {
   let created3;
   const tools3 = new Map();
-  const ctx3 = { on(event, cb) { if (event === 'agent/created') created3 = cb; }, effect(fn) { fn(); }, tools: { register(t) { tools3.set(t.name, t); return () => {}; } } };
+  const ctx3 = { on(event, cb) { if (event === 'agent/created') created3 = cb; }, effect(fn) { fn(); }, tools: { register(t) { return registerChecked(tools3, t); } } };
   await apply(ctx3, {
     memoryPath: '',
     enabled: true,
@@ -241,7 +252,7 @@ await apply(ctx, {
   ]);
   let created4;
   const tools4 = new Map();
-  const ctx4 = { on(event, cb) { if (event === 'agent/created') created4 = cb; }, effect(fn) { fn(); }, tools: { register(t) { tools4.set(t.name, t); return () => {}; } } };
+  const ctx4 = { on(event, cb) { if (event === 'agent/created') created4 = cb; }, effect(fn) { fn(); }, tools: { register(t) { return registerChecked(tools4, t); } } };
   await apply(ctx4, {
     memoryPath: '',
     enabled: true,
